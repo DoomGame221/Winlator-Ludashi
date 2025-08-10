@@ -367,11 +367,6 @@ public class ContainersFragment extends Fragment {
                     case R.id.container_info:
                         (new StorageInfoDialog(getActivity(), container)).show();
                         break;
-                    case R.id.container_reconfigure:
-                        ContentDialog.confirm(getContext(), R.string.do_you_want_to_reconfigure_wine, () -> {
-                            new File(container.getRootDir(), ".wine/.update-timestamp").delete();
-                        });
-                        break;
                     case R.id.container_export:
                         exportContainer(container);
                         break;
