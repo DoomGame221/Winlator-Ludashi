@@ -630,10 +630,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
         return false;
     }
 
-
-
-
-
     // Inside XServerDisplayActivity class
     private void handleCapturedPointer(MotionEvent event) {
         boolean handled = false;
@@ -709,14 +705,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
         }
     }
 
-
-
-    //    private void setCustomCursor() {
-//        View decorView = getWindow().getDecorView();
-//        Bitmap transparentCursorBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.transparent_cursor);
-//        PointerIcon transparentCursorIcon = PointerIcon.create(transparentCursorBitmap, 0, 0);
-//        decorView.setPointerIcon(transparentCursorIcon);
-//    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -847,15 +835,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void onBackPressed() {
-        if (environment != null) {
-            if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-            else drawerLayout.closeDrawers();
-        }
-    }
-
-    private void openXServerDrawer() {
         if (environment != null) {
             if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.openDrawer(GravityCompat.START);
