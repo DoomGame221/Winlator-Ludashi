@@ -1828,10 +1828,12 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
         for (String dll : dlls) {
             File srcFile = new File(system32dlls, dll);
             File dstFile = new File(windowsDir, "system32/" + dll);
-            FileUtils.copy(srcFile, dstFile);
+            if (dstFile.exists()) dstFile.delete();
+            FileUtils.symlink(srcFile, dstFile);
             srcFile = new File(syswow64dlls, dll);
             dstFile = new File(windowsDir, "syswow64/" + dll);
-            FileUtils.copy(srcFile, dstFile);
+            if (dstFile.exists()) dstFile.delete();
+            FileUtils.symlink(srcFile, dstFile);
         }
    }
 
