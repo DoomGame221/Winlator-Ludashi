@@ -1051,8 +1051,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
 
         // Set environment variables
         envVars.put("LC_ALL", lc_all);
-        envVars.put("MESA_DEBUG", "silent");
-        envVars.put("MESA_NO_ERROR", "1");
         envVars.put("WINEPREFIX", imageFs.wineprefix);
 
         boolean enableWineDebug = preferences.getBoolean("enable_wine_debug", false);
@@ -1534,7 +1532,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
             envVars.put("VK_ICD_FILENAMES", imageFs.getShareDir() + "/vulkan/icd.d/wrapper_icd.aarch64.json");
 
         envVars.put("GALLIUM_DRIVER", "zink");
-        envVars.put("LIBGL_KOPPER_DISABLE", "true");
 
         if (firstTimeBoot) {
             Log.d("XServerDisplayActivity", "First time container boot, re-extracting wrapper");
