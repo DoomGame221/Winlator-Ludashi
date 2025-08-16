@@ -1534,9 +1534,11 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
         envVars.put("GALLIUM_DRIVER", "zink");
 
         if (firstTimeBoot) {
-            Log.d("XServerDisplayActivity", "First time container boot, re-extracting wrapper");
+            Log.d("XServerDisplayActivity", "First time container boot, re-extracting libs");
             TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this, "graphics_driver/wrapper" + ".tzst", rootDir);
             TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this, "graphics_driver/extra_libs" + ".tzst", rootDir);
+            if (wineInfo.isArm64EC())
+                TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this, "graphics_driver/zink_dlls" + ".tzst", new File(rootDir, imageFs.WINEPREFIX + "/drive_c/windows"));
         }
 
         if (adrenoToolsDriverId != "System") {
@@ -1770,9 +1772,6 @@ public class XServerDisplayActivity extends AppCompatActivity implements Navigat
                 if (wincomponent[1].equals(oldWinComponentsIter.next()[1]) && !firstTimeBoot) continue;
                 String identifier = wincomponent[0];
                 boolean useNative = wincomponent[1].equals("1");
-
-                if (!wineInfo.isArm64EC() && identifier.contains("opengl") && useNative)
-                    continue;
 
                 if (useNative) {
                     TarCompressorUtils.extract(TarCompressorUtils.Type.ZSTD, this, "wincomponents/"+identifier+".tzst", windowsDir, onExtractFileListener);
