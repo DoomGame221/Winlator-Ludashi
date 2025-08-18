@@ -57,7 +57,7 @@ public class WinHandler {
     private SharedPreferences preferences;
     private byte triggerType;
 
-    private boolean xinputDisabled; // Used for exclusive mouse control
+    private boolean xinputDisabled; // Used for exclusive mouse controllegacy
     private boolean xinputDisabledInitialized = false;
 
 
