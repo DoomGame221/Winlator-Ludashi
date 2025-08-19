@@ -230,11 +230,6 @@ public class ShortcutSettingsDialog extends ContentDialog {
         SDInputType.setSelection(((inputType & WinHandler.FLAG_DINPUT_MAPPER_STANDARD) == WinHandler.FLAG_DINPUT_MAPPER_STANDARD) ? 0 : 1);
         llDInputType.setVisibility(cbEnableDInput.isChecked()?View.VISIBLE:View.GONE);
 
-
-        final CheckBox cbForceFullscreen = findViewById(R.id.CBForceFullscreen);
-        cbForceFullscreen.setChecked(shortcut.getExtra("forceFullscreen", "0").equals("1"));
-
-
         final Spinner sBox64Preset = findViewById(R.id.SBox64Preset);
         Box64PresetManager.loadSpinner("box64", sBox64Preset, shortcut.getExtra("box64Preset", shortcut.container.getBox64Preset()));
 
@@ -398,7 +393,6 @@ public class ShortcutSettingsDialog extends ContentDialog {
                 shortcut.putExtra("audioDriver", !audioDriver.equals(shortcut.container.getAudioDriver()) ? audioDriver : null);
                 shortcut.putExtra("emulator", !emulator.equals(shortcut.container.getEmulator()) ? emulator : null);
                 shortcut.putExtra("midiSoundFont", !midiSoundFont.equals(shortcut.container.getMIDISoundFont()) ? midiSoundFont : null);
-                shortcut.putExtra("forceFullscreen", cbForceFullscreen.isChecked() ? "1" : null);
 
                 if (cbUseSecondaryExec.isChecked()) {
                     String secondaryExec = etSecondaryExec.getText().toString().trim();
