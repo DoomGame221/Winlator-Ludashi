@@ -1,33 +1,26 @@
 package com.winlator.cmod.container;
 
 import android.content.Context;
-import android.content.res.AssetManager;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
 import com.winlator.cmod.R;
-import com.winlator.cmod.contents.ContentProfile;
 import com.winlator.cmod.contents.ContentsManager;
 import com.winlator.cmod.core.Callback;
 import com.winlator.cmod.core.FileUtils;
+import com.winlator.cmod.core.MSLink;
 import com.winlator.cmod.core.OnExtractFileListener;
 import com.winlator.cmod.core.TarCompressorUtils;
 import com.winlator.cmod.core.WineInfo;
 import com.winlator.cmod.xenvironment.ImageFs;
 
-import java.io.FilenameFilter;
 import java.util.Arrays;
-import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.Executors;
@@ -210,7 +203,16 @@ public class ContainerManager {
                 files.addAll(Arrays.asList(desktopDir.listFiles()));
             if (files != null) {
                 for (File file : files) {
-                    if (file.getName().endsWith(".desktop")) shortcuts.add(new Shortcut(container, file));
+                    String fileName = file.getName();
+                    if (fileName.endsWith(".lnk")) {
+                        String filePath = file.getPath();
+                        File desktopFile = new File(filePath.substring(0, filePath.lastIndexOf(".")) + ".desktop");
+                        if (!desktopFile.exists()) {
+                            MSLink.createDesktopFile(file, context);
+                            shortcuts.add(new Shortcut(container, desktopFile));
+                        }
+                    }
+                    else if (fileName.endsWith(".desktop")) shortcuts.add(new Shortcut(container, file));
                 }
             }
         }

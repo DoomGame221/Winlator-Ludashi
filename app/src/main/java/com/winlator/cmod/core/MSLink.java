@@ -1,8 +1,15 @@
 package com.winlator.cmod.core;
 
+import android.content.Context;
+
+import com.winlator.cmod.xenvironment.ImageFs;
+
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -167,6 +174,61 @@ public abstract class MSLink {
         }
         catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static String parseFilePath(File lnkFile) {
+        String filePath = "";
+        try {
+            int linkFlags, linkInfoStart;
+            FileInputStream fis = new FileInputStream(lnkFile);
+            byte[] bytes = new byte[(int) lnkFile.length()];
+            DataInputStream dis = new DataInputStream(fis);
+            dis.readFully(bytes);
+            ByteBuffer data = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN);
+            linkFlags = data.getInt(0x14);
+            if ((linkFlags & (1 << 0)) != 0) {
+                short linkInfoTargetIdListSize = data.getShort(0x4C);
+                linkInfoStart = 0x4E + linkInfoTargetIdListSize;
+            }
+            else if ((linkFlags & (1 << 1)) != 0) {
+                linkInfoStart = 0x4C;
+            }
+            else {
+                return filePath;
+            }
+
+            int localBasePathOffset = data.getInt(linkInfoStart + 16);
+            if (localBasePathOffset > 0) {
+                filePath = StringUtils.fromANSIString(data, linkInfoStart + localBasePathOffset);
+            }
+            dis.close();
+            fis.close();
+        }
+        catch (IOException e) {
+        }
+
+        return filePath;
+    }
+
+    public static void createDesktopFile(File lnkFile, Context context) {
+        String lnkFilePath = lnkFile.getPath();
+        String filePath = StringUtils.escapeFileDOSPath(parseFilePath(lnkFile));
+        ImageFs imageFs = ImageFs.find(context);
+
+        File desktopFile = new File(lnkFilePath.substring(0, lnkFilePath.lastIndexOf(".")) + ".desktop");
+        try {
+            FileOutputStream fos = new FileOutputStream(desktopFile);
+            PrintWriter pw = new PrintWriter(fos);
+            pw.write("[Desktop Entry]\n");
+            pw.write("Name=" + lnkFile.getName().substring(0, lnkFile.getName().lastIndexOf(".")) + "\n");
+            pw.write("Exec=env WINEPREFIX=" + "\"" + imageFs.wineprefix + "\"" + " wine " + filePath + "\n");
+            pw.write("Type=Application\n");
+            pw.write("StartupNotify=True\n");
+            pw.close();
+            fos.close();
+        }
+        catch (IOException e) {
         }
     }
 }
