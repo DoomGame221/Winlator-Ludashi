@@ -171,8 +171,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return;
             }
         }
-
-        show(new ContainersFragment(), true);  // Pass `true` to trigger the reverse animation
+        if (!editInputControls)
+            show(new ContainersFragment(), true);  // Pass `true` to trigger the reverse animation
+        else
+            super.onBackPressed();
     }
 
     private boolean requestAppPermissions() {
@@ -195,7 +197,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == android.R.id.home) {
-            // Toggle the drawer
+            if (editInputControls) {
+                onBackPressed();
+                return true;
+            }
+
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START);
             } else {
