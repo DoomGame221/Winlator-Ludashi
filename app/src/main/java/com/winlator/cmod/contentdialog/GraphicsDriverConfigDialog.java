@@ -1,6 +1,7 @@
 package com.winlator.cmod.contentdialog;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -103,8 +104,13 @@ public class GraphicsDriverConfigDialog extends ContentDialog {
     }
 
     private String[] queryAvailableExtensions(String driver, Context context) {
-        String[] availableExtensions = GPUInformation.enumerateExtensions(driver, context);
-        return availableExtensions;
+        ArrayList<String> availableExtensions;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+            availableExtensions = new ArrayList<>(Arrays.asList(GPUInformation.enumerateExtensions(driver, context)));
+        else
+            availableExtensions = new ArrayList<>(Arrays.asList(GPUInformation.enumerateExtensions(null, context)));
+
+        return (String[]) availableExtensions.toArray();
     }
   
     public GraphicsDriverConfigDialog(View anchor, String graphicsDriver, TextView graphicsDriverVersionView) {
