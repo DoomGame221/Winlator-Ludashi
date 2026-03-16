@@ -181,6 +181,12 @@ android {
         jniLibs {
             useLegacyPackaging = true
         }
+        resources {
+            excludes += ['META-INF/com.android.tools/proguard/coroutines.pro']
+            pickFirsts += ['assets/dexopt/baseline.prof', 'assets/dexopt/baseline.profm']
+        }
+        pickFirst 'assets/dexopt/baseline.prof'
+        pickFirst 'assets/dexopt/baseline.profm'
     }
 }
 
