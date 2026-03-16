@@ -55,18 +55,31 @@ jobs:
         if: env.BUILD_TYPE == 'Release'
         run: |
           CURRENT="${{ env.CURRENT_VERSION }}"
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+          # แยก suffix ออกก่อน เช่น "7.1.4x-cmod" → suffix="-cmod", base="7.1.4x"
+          SUFFIX=$(echo "$CURRENT" | grep -oE '\-.*$' || true)
+          BASE=$(echo "$CURRENT" | sed 's/-.*$//')
+
+          # แยก MAJOR.MINOR.PATCH โดย PATCH อาจมีตัวอักษรต่อท้าย เช่น "4x"
+          MAJOR=$(echo "$BASE" | cut -d '.' -f 1)
+          MINOR=$(echo "$BASE" | cut -d '.' -f 2)
+          PATCH_RAW=$(echo "$BASE" | cut -d '.' -f 3)
+
+          # แยกตัวเลขกับตัวอักษรใน PATCH เช่น "4x" → NUM=4, TAG="x"
+          PATCH_NUM=$(echo "$PATCH_RAW" | grep -oE '^[0-9]+')
+          PATCH_TAG=$(echo "$PATCH_RAW" | grep -oE '[^0-9].*$' || true)
+
+          # เพิ่ม PATCH_NUM ขึ้น 1
+          NEW_PATCH=$((PATCH_NUM + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH$PATCH_TAG$SUFFIX"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-          # Update versionName in build.gradle.kts
-          sed -i "s/versionName = \"$CURRENT\"/versionName = \"$NEW_VERSION\"/" app/build.gradle.kts
+          # อัพเดทไฟล์ build.gradle
+          sed -i "s/versionName \"$CURRENT\"/versionName \"$NEW_VERSION\"/" app/build.gradle
 
-          # Update versionCode (increment by 1)
-          CURRENT_CODE=$(grep 'versionCode' app/build.gradle.kts | head -1 | grep -oE '[0-9]+')
+          CURRENT_CODE=$(grep 'versionCode' app/build.gradle | head -1 | grep -oE '[0-9]+')
           NEW_CODE=$((CURRENT_CODE + 1))
-          sed -i "s/versionCode = $CURRENT_CODE/versionCode = $NEW_CODE/" app/build.gradle.kts
+          sed -i "s/versionCode $CURRENT_CODE/versionCode $NEW_CODE/" app/build.gradle
 
           echo "Bumped: $CURRENT → $NEW_VERSION (versionCode: $CURRENT_CODE → $NEW_CODE)"
 
@@ -85,7 +98,7 @@ jobs:
 
       - name: Get final version
         run: |
-          echo "VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | cut -d '"' -f 2)" >> $GITHUB_ENV
+          echo "VERSION=$(grep 'versionName' app/build.gradle | head -1 | cut -d '"' -f 2)" >> $GITHUB_ENV
 
       - name: List assets
         run: ls -la app/src/main/assets
