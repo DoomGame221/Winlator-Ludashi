@@ -11,10 +11,6 @@ on:
         options:
           - Debug
           - Release
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
 
 jobs:
   build:
@@ -95,12 +91,19 @@ jobs:
         run: ls -la app/src/main/assets
 
       # ─── Debug: Upload artifact (auto-deleted after 2 days) ──────────────────
+
+      - name: Rename Debug APK
+        if: env.BUILD_TYPE == 'Debug'
+        run: |
+          cp ./app/build/outputs/apk/debug/app-debug.apk \
+             ./Winlator-Bionic-Debug-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
+
       - name: Upload Debug APK as artifact
         if: env.BUILD_TYPE == 'Debug'
         uses: actions/upload-artifact@v4
         with:
-          name: Winlator-Bionic-Debug-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
-          path: ./app/build/outputs/apk/debug/app-debug.apk
+          name: Winlator-Bionic-Debug-${{ env.VERSION }}-${{ env.SHORT_SHA }}   # ← ไม่มี .apk ตรงนี้
+          path: ./Winlator-Bionic-Debug-${{ env.VERSION }}-${{ env.SHORT_SHA }}.apk
           retention-days: 2
 
       # ─── Release: Commit bump → Tag → GitHub Release (direct .apk download) ──
