@@ -48,7 +48,7 @@ jobs:
       # ─── Version bump (Release only) ─────────────────────────────────────────
       - name: Read current version
         run: |
-          VERSION=$(grep 'versionName' app/build.gradle.kts | head -1 | cut -d '"' -f 2)
+          VERSION=$(grep 'versionName' app/build.gradle | head -1 | cut -d '"' -f 2)
           echo "CURRENT_VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Bump patch version for Release
