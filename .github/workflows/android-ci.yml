@@ -83,6 +83,25 @@ jobs:
 
           echo "Bumped: $CURRENT → $NEW_VERSION (versionCode: $CURRENT_CODE → $NEW_CODE)"
 
+
+      - name: Fix corrupted PNG resources
+        run: |
+          sudo apt-get install -y pngcheck pngcrush 2>/dev/null || true
+          find app/src/main/res -name "*.png" | while read f; do
+            if ! pngcheck "$f" > /dev/null 2>&1; then
+              echo "Fixing: $f"
+              pngcrush -ow "$f" 2>/dev/null || \
+              python3 -c "
+          from PIL import Image
+          import sys
+          img = Image.open('$f')
+          img.save('$f')
+          print('Re-saved: $f')
+              " 2>/dev/null || true
+            fi
+          done
+          pip install Pillow --break-system-packages -q
+
       # ─── Build ───────────────────────────────────────────────────────────────
       - name: Build Debug APK
         if: env.BUILD_TYPE == 'Debug'

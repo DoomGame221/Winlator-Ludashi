@@ -152,6 +152,14 @@ android {
         targetCompatibility JavaVersion.VERSION_17
     }
 
+    buildTypes {
+        release {
+            aaptOptions {
+                cruncherEnabled false
+            }
+        }
+    }
+
     // Keep Winlator’s buildTypes
     buildTypes {
         debug {
